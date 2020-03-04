@@ -8,13 +8,42 @@ export default function App() {
       <thead>
         <tr>
           <Draggable type="td">
-            <div>Col 1</div>
+            <div id="C1">Col 1</div>
           </Draggable>
-          <td>Col 2</td>
-          <td>Col 3</td>
+          <Draggable type="td">
+            <div id="C2">Col 2</div>
+          </Draggable>
+          <Draggable type="td">
+            <div id="C3">Col 3</div>
+          </Draggable>
         </tr>
       </thead>
       <tbody>
+        <tr>
+          <td>A</td>
+          <td>B</td>
+          <td>C</td>
+        </tr>
+        <tr>
+          <td>A</td>
+          <td>B</td>
+          <td>C</td>
+        </tr>
+        <tr>
+          <td>A</td>
+          <td>B</td>
+          <td>C</td>
+        </tr>
+        <tr>
+          <td>A</td>
+          <td>B</td>
+          <td>C</td>
+        </tr>
+        <tr>
+          <td>A</td>
+          <td>B</td>
+          <td>C</td>
+        </tr>
         <tr>
           <td>A</td>
           <td>B</td>
