@@ -8,7 +8,8 @@ export default class Draggable extends React.Component {
 
     this.state = {
       element: this.props.children,
-      isDrag: false,
+      isReadyForDrag: false,
+      isDraging: false,
       evtX: 0,
       evtY: 0,
       size: [0, 0]
@@ -24,67 +25,96 @@ export default class Draggable extends React.Component {
     this.setState({
       size: [(box.right - box.left) / 2, (box.bottom - box.top) / 2]
     });
+    console.log("add");
+    window.addEventListener("mouseup", this.onMouseUp);
+    window.addEventListener("mousemove", this.onMouseMove);
+  }
+
+  componentWillUnmount() {
+    console.log("remove");
+    window.removeEventListener("mouseup", this.onMouseUp);
+    window.removeEventListener("mousemove", this.onMouseMove);
   }
 
   onMouseDown(event) {
     event.persist();
-    this.setState({ isDrag: true, evtX: event.pageX, evtY: event.pageY });
+    if (!this.state.isReadyForDrag && !this.state.isDraging) {
+      this.setState({
+        isReadyForDrag: true,
+        isDraging: false
+      });
+    }
   }
 
   onMouseUp(event) {
-    event.persist();
-    this.setState(
-      { isDrag: false, evtX: event.pageX, evtY: event.pageY },
-      function() {
-        console.log(this.state.evtX, this.state.evtY);
-        console.log(
-          document.elementFromPoint(this.state.evtX, this.state.evtY)
-        );
-      }
-    );
+    event.preventDefault();
+    if (this.state.isReadyForDrag) {
+      this.setState({
+        isReadyForDrag: false
+      });
+    } else if (this.state.isDraging) {
+      this.setState(
+        {
+          isDraging: false,
+          evtX: event.clientX,
+          evtY: event.clientY
+        },
+        function() {
+          let target = document.elementFromPoint(
+            this.state.evtX,
+            this.state.evtY
+          );
+          let droppable = target.closest(".droppable");
+          if (droppable) {
+            console.log("from: ", this.props.id, "to: ", droppable.id);
+          }
+        }
+      );
+    }
   }
 
   onMouseMove(event) {
-    event.persist();
-    this.setState({ evtX: event.pageX, evtY: event.pageY });
+    event.preventDefault();
+    if (this.state.isReadyForDrag) {
+      this.setState({
+        isReadyForDrag: false,
+        isDraging: true,
+        evtX: event.pageX,
+        evtY: event.pageY
+      });
+    } else if (this.state.isDraging) {
+      this.setState({ evtX: event.pageX, evtY: event.pageY });
+    }
   }
 
   render() {
-    return (
-      <React.Fragment>
-        {React.createElement(
-          this.props.type,
-          {
-            ref: "refdnd",
-            onMouseDown: event => this.onMouseDown(event),
-            onMouseUp: event => this.onMouseUp(event),
-            onMouseMove: event => this.onMouseMove(event)
-          },
-          [
-            this.props.children,
-            this.state.isDrag &&
-              React.createElement(
-                "div",
-                {
-                  id: "dnd",
-                  key: "dnd",
-                  style: {
-                    position: "absolute",
-                    zIndex: 1000,
-                    left: this.state.evtX - this.state.size[0],
-                    top: this.state.evtY - this.state.size[1],
-                    border: "1px solid black",
-                    borderRadius: "5px 5px 5px 5px",
-                    opacity: 0.8,
-                    background: "#FFF",
-                    padding: "5px"
-                  }
-                },
-                this.props.children
-              )
-          ]
-        )}
-      </React.Fragment>
+    return React.createElement(
+      this.props.type,
+      {
+        ref: "refdnd",
+        onMouseDown: event => this.onMouseDown(event),
+        ...this.props
+      },
+      [
+        this.props.children,
+        this.state.isDraging &&
+          React.createElement(
+            "div",
+            {
+              id: "dnd",
+              key: "dnd",
+              ...this.props,
+              style: {
+                position: "absolute",
+                zIndex: 1000,
+                left: this.state.evtX - this.state.size[0],
+                top: this.state.evtY - this.state.size[1],
+                opacity: 0.8
+              }
+            },
+            this.props.children
+          )
+      ]
     );
   }
 }

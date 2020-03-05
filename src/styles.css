@@ -2,3 +2,16 @@
   font-family: sans-serif;
   text-align: center;
 }
+
+table {
+  border: none;
+  border-collapse: collapse;
+}
+
+th {
+  padding: 0px;
+}
+
+td {
+  padding: 0px;
+}

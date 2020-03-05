@@ -1,21 +1,28 @@
 import React from "react";
 import "./styles.css";
 import Draggable from "./DND/Draggable.js";
+import Droppable from "./DND/Droppable.js";
 
 export default function App() {
   return (
-    <table border="1px solid black">
+    <table>
       <thead>
         <tr>
-          <Draggable type="td">
-            <div id="C1">Col 1</div>
-          </Draggable>
-          <Draggable type="td">
-            <div id="C2">Col 2</div>
-          </Draggable>
-          <Draggable type="td">
-            <div id="C3">Col 3</div>
-          </Draggable>
+          <Droppable id="D1" type="th">
+            <Draggable id="K1" type="div">
+              Col 1
+            </Draggable>
+          </Droppable>
+          <Droppable id="D2" type="th">
+            <Draggable id="K2" type="div">
+              Col 2
+            </Draggable>
+          </Droppable>
+          <Droppable id="D3" type="th">
+            <Draggable id="K3" type="div">
+              Col 3
+            </Draggable>
+          </Droppable>
         </tr>
       </thead>
       <tbody>
