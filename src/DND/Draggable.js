@@ -22,6 +22,10 @@ export default class Draggable extends React.Component {
     this.onTouchStart = this.onTouchStart.bind(this);
     this.onTouchEnd = this.onTouchEnd.bind(this);
     this.onTouchMove = this.onTouchMove.bind(this);
+
+    this.start = this.start.bind(this);
+    this.stop = this.stop.bind(this);
+    this.move = this.move.bind(this);
   }
 
   componentDidMount() {
@@ -42,8 +46,7 @@ export default class Draggable extends React.Component {
     window.removeEventListener("touchmove", this.onTouchMove);
   }
 
-  onMouseDown(event) {
-    event.persist();
+  start() {
     if (!this.state.isReadyForDrag && !this.state.isDraging) {
       this.setState({
         isReadyForDrag: true,
@@ -52,8 +55,7 @@ export default class Draggable extends React.Component {
     }
   }
 
-  onMouseUp(event) {
-    event.preventDefault();
+  stop(x, y) {
     if (this.state.isReadyForDrag) {
       this.setState({
         isReadyForDrag: false
@@ -62,8 +64,8 @@ export default class Draggable extends React.Component {
       this.setState(
         {
           isDraging: false,
-          evtX: event.clientX,
-          evtY: event.clientY
+          evtX: x,
+          evtY: y
         },
         function() {
           let target = document.elementFromPoint(
@@ -82,35 +84,50 @@ export default class Draggable extends React.Component {
     }
   }
 
-  onMouseMove(event) {
-    event.preventDefault();
+  move(x, y) {
     if (this.state.isReadyForDrag) {
       this.setState({
         isReadyForDrag: false,
         isDraging: true,
-        evtX: event.pageX,
-        evtY: event.pageY
+        evtX: x,
+        evtY: y
       });
     } else if (this.state.isDraging) {
-      this.setState({ evtX: event.pageX, evtY: event.pageY });
+      this.setState({ evtX: x, evtY: y });
     }
   }
 
-  onTouchStart(event) {
-    this.onMouseDown(event);
+  onMouseDown() {
+    this.start();
+  }
+
+  onMouseUp(event) {
+    event.preventDefault();
+    this.stop(event.clientX, event.clientY);
+  }
+
+  onMouseMove(event) {
+    event.preventDefault();
+    this.move(event.pageX, event.pageY);
+  }
+
+  onTouchStart() {
+    this.start();
   }
 
   onTouchEnd(event) {
     event.preventDefault();
     if (event.changedTouches.length > 0) {
-      this.onMouseUp(event.changedTouches[0]);
+      let touch = event.changedTouches[0];
+      this.stop(touch.clientX, touch.clientY);
     }
   }
 
   onTouchMove(event) {
     event.preventDefault();
     if (event.changedTouches.length > 0) {
-      this.onMouseUp(event.changedTouches[0]);
+      let touch = event.changedTouches[0];
+      this.move(touch.pageX, touch.pageY);
     }
   }
 
