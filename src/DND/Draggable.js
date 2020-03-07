@@ -18,6 +18,10 @@ export default class Draggable extends React.Component {
     this.onMouseDown = this.onMouseDown.bind(this);
     this.onMouseUp = this.onMouseUp.bind(this);
     this.onMouseMove = this.onMouseMove.bind(this);
+
+    this.onTouchStart = this.onTouchStart.bind(this);
+    this.onTouchEnd = this.onTouchEnd.bind(this);
+    this.onTouchMove = this.onTouchMove.bind(this);
   }
 
   componentDidMount() {
@@ -25,15 +29,17 @@ export default class Draggable extends React.Component {
     this.setState({
       size: [(box.right - box.left) / 2, (box.bottom - box.top) / 2]
     });
-    console.log("add");
     window.addEventListener("mouseup", this.onMouseUp);
     window.addEventListener("mousemove", this.onMouseMove);
+    window.addEventListener("touchend", this.onTouchEnd);
+    window.addEventListener("touchmove", this.onTouchMove);
   }
 
   componentWillUnmount() {
-    console.log("remove");
     window.removeEventListener("mouseup", this.onMouseUp);
     window.removeEventListener("mousemove", this.onMouseMove);
+    window.removeEventListener("touchend", this.onTouchEnd);
+    window.removeEventListener("touchmove", this.onTouchMove);
   }
 
   onMouseDown(event) {
@@ -64,9 +70,12 @@ export default class Draggable extends React.Component {
             this.state.evtX,
             this.state.evtY
           );
-          let droppable = target.closest(".droppable");
-          if (droppable) {
-            console.log("from: ", this.props.id, "to: ", droppable.id);
+          console.log(target);
+          if (target) {
+            let droppable = target.closest(".droppable");
+            if (droppable) {
+              console.log("from: ", this.props.id, "to: ", droppable.id);
+            }
           }
         }
       );
@@ -87,12 +96,31 @@ export default class Draggable extends React.Component {
     }
   }
 
+  onTouchStart(event) {
+    this.onMouseDown(event);
+  }
+
+  onTouchEnd(event) {
+    event.preventDefault();
+    if (event.changedTouches.length > 0) {
+      this.onMouseUp(event.changedTouches[0]);
+    }
+  }
+
+  onTouchMove(event) {
+    event.preventDefault();
+    if (event.changedTouches.length > 0) {
+      this.onMouseUp(event.changedTouches[0]);
+    }
+  }
+
   render() {
     return React.createElement(
       this.props.type,
       {
         ref: "refdnd",
         onMouseDown: event => this.onMouseDown(event),
+        onTouchStart: event => this.onTouchStart(event),
         ...this.props
       },
       [
