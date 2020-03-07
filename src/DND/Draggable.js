@@ -97,7 +97,8 @@ export default class Draggable extends React.Component {
     }
   }
 
-  onMouseDown() {
+  onMouseDown(event) {
+    event.preventDefault();
     this.start();
   }
 
@@ -111,7 +112,8 @@ export default class Draggable extends React.Component {
     this.move(event.pageX, event.pageY);
   }
 
-  onTouchStart() {
+  onTouchStart(event) {
+    event.preventDefault();
     this.start();
   }
 
