@@ -185,9 +185,10 @@ export default class Draggable extends React.Component {
       this.props.type,
       {
         ref: "refdnd",
+        id: this.props.id,
+        style: this.props.style,
         onMouseDown: event => this.onMouseDown(event),
         onTouchStart: event => this.onTouchStart(event),
-        ...this.props
       },
       [
         this.props.children,
@@ -197,8 +198,8 @@ export default class Draggable extends React.Component {
             {
               id: "dnd",
               key: "dnd",
-              ...this.props,
               style: {
+                ...this.props.style,
                 position: "absolute",
                 zIndex: 1000,
                 left: this.state.evtX - this.state.delta[0],
