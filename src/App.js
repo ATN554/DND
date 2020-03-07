@@ -9,7 +9,7 @@ export default function App() {
       <thead>
         <tr>
           <Droppable id="D1" type="th">
-            <Draggable id="K1" type="div">
+            <Draggable id="K1" type="div" axis="horizontal">
               Col 1
             </Draggable>
           </Droppable>
@@ -19,7 +19,7 @@ export default function App() {
             </Draggable>
           </Droppable>
           <Droppable id="D3" type="th">
-            <Draggable id="K3" type="div">
+            <Draggable id="K3" type="div" axis="vertical">
               Col 3
             </Draggable>
           </Droppable>
