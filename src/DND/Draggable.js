@@ -7,6 +7,7 @@ export default class Draggable extends React.Component {
     this.ref = null;
 
     let axis = this.props.axis === undefined ? "both" : this.props.axis;
+    let enabled = this.props.enabled === undefined ? true : this.props.enabled;
 
     this.state = {
       element: this.props.children,
@@ -15,9 +16,10 @@ export default class Draggable extends React.Component {
       evtX: 0,
       evtY: 0,
       position: [0, 0],
-      delta: [0, 0],
+      innerShift: [0, 0],
       xAxisMove: axis === "horizontal" || axis === "both",
-      yAxisMove: axis === "vertical" || axis === "both"
+      yAxisMove: axis === "vertical" || axis === "both",
+      enabled: enabled,
     };
 
     this.onMouseDown = this.onMouseDown.bind(this);
@@ -28,6 +30,8 @@ export default class Draggable extends React.Component {
     this.onTouchEnd = this.onTouchEnd.bind(this);
     this.onTouchMove = this.onTouchMove.bind(this);
 
+    this.setEnabled = this.setEnabled.bind(this);
+
     this.start = this.start.bind(this);
     this.stop = this.stop.bind(this);
     this.move = this.move.bind(this);
@@ -37,11 +41,8 @@ export default class Draggable extends React.Component {
     let box = this.refs.refdnd.getBoundingClientRect();
     this.setState({
       position: [box.x, box.y],
-      delta: [
-        this.state.xAxisMove ? (box.right - box.left) / 2 : 0,
-        this.state.yAxisMove ? (box.bottom - box.top) / 2 : 0
-      ]
     });
+
     window.addEventListener("mouseup", this.onMouseUp);
     window.addEventListener("mousemove", this.onMouseMove);
     window.addEventListener("touchend", this.onTouchEnd);
@@ -55,28 +56,40 @@ export default class Draggable extends React.Component {
     window.removeEventListener("touchmove", this.onTouchMove);
   }
 
-  start() {
-    if (!this.state.isReadyForDrag && !this.state.isDraging) {
-      this.setState({
-        isReadyForDrag: true,
-        isDraging: false
-      });
+  setEnabled(enabled) {
+    if (this.state.enabled !== enabled) {
+      this.setState({enabled: enabled});
     }
   }
 
-  stop(x, y) {
+  start(x, y) {
+    let _x = this.state.xAxisMove ? x : this.state.position[0];
+    let _y = this.state.yAxisMove ? y : this.state.position[1];
+    if (this.state.enabled) {
+      if (!this.state.isReadyForDrag && !this.state.isDraging) {
+        let box = this.refs.refdnd.getBoundingClientRect();
+        this.setState({
+          isReadyForDrag: true,
+          isDraging: false,
+          evtX: _x,
+          evtY: _y,
+          innerShift: [
+            this.state.xAxisMove ? (_x - box.x) : 0,
+            this.state.yAxisMove ? (_y - box.y) : 0
+          ]
+        });
+      }
+    }
+  }
+
+  stop() {
     if (this.state.isReadyForDrag) {
       this.setState({
         isReadyForDrag: false
       });
     } else if (this.state.isDraging) {
-      let _x = this.state.xAxisMove ? x : this.state.position[0];
-      let _y = this.state.yAxisMove ? y : this.state.position[1];
-      this.setState(
-        {
-          isDraging: false,
-          evtX: _x,
-          evtY: _y
+      this.setState({
+          isDraging: false
         },
         function() {
           let target = document.elementFromPoint(
@@ -88,14 +101,8 @@ export default class Draggable extends React.Component {
             let droppable = target.closest(".droppable");
             if (droppable) {
               let idTo = droppable.id;
-              if (idFrom !== idTo) {
-                if (this.props.onDragEnd !== undefined) {
-                  this.props.onDragEnd(idFrom, idTo, this.state.evtX, this.state.evtY);
-                }
-              } else {
-                if (this.props.onDragCancel !== undefined) {
-                  this.props.onDragCancel(idFrom, this.state.evtX, this.state.evtY);
-                }
+              if (this.props.onDragEnd !== undefined) {
+                this.props.onDragEnd(idFrom, idTo, this.state.evtX, this.state.evtY);
               }
             } else {
               if (this.props.onDragCancel !== undefined) {
@@ -115,43 +122,46 @@ export default class Draggable extends React.Component {
   move(x, y) {
     let _x = this.state.xAxisMove ? x : this.state.position[0];
     let _y = this.state.yAxisMove ? y : this.state.position[1];
-    if (this.state.isReadyForDrag) {
-      this.setState(
-        {
-          isReadyForDrag: false,
-          isDraging: true,
-          evtX: _x,
-          evtY: _y
-        },
-        function() {
-          if (this.props.onDragStart !== undefined) {
-            this.props.onDragStart(this.props.id, this.state.evtX, this.state.evtY);
+    let allowMove = true;
+    if (this.props.allowMove !== undefined) {
+      allowMove = this.props.allowMove(this.state.evtX, this.state.evtY, _x, _y);
+    }
+    if (allowMove) {
+      if (this.state.isReadyForDrag) {
+        this.setState({
+            isReadyForDrag: false,
+            isDraging: true,
+          },
+          function() {
+            if (this.props.onDragStart !== undefined) {
+              this.props.onDragStart(this.props.id, this.state.evtX, this.state.evtY);
+            }
           }
-        }
-      );
-    } else if (this.state.isDraging) {
-      this.setState(
-        {
-          evtX: _x,
-          evtY: _y
-        },
-        function() {
-          if (this.props.onDragMove !== undefined) {
-            this.props.onDragMove(this.props.id, this.state.evtX, this.state.evtY);
+        );
+      } else if (this.state.isDraging) {
+        this.setState({
+            evtX: _x,
+            evtY: _y
+          },
+          function() {
+            if (this.props.onDragMove !== undefined) {
+              this.props.onDragMove(this.props.id, this.state.evtX, this.state.evtY);
+            }
           }
-        }
-      );
+        );
+      }
     }
   }
 
   onMouseDown(event) {
+    event.persist();
     event.preventDefault();
-    this.start();
+    this.start(event.clientX, event.clientY);
   }
 
   onMouseUp(event) {
     event.preventDefault();
-    this.stop(event.clientX, event.clientY);
+    this.stop();
   }
 
   onMouseMove(event) {
@@ -161,15 +171,15 @@ export default class Draggable extends React.Component {
 
   onTouchStart(event) {
     event.preventDefault();
-    this.start();
+    if (event.changedTouches.length > 0) {
+      let touch = event.changedTouches[0];
+      this.start(touch.pageX, touch.pageY);
+    }
   }
 
   onTouchEnd(event) {
     event.preventDefault();
-    if (event.changedTouches.length > 0) {
-      let touch = event.changedTouches[0];
-      this.stop(touch.clientX, touch.clientY);
-    }
+    this.stop();
   }
 
   onTouchMove(event) {
@@ -202,8 +212,8 @@ export default class Draggable extends React.Component {
                 ...this.props.style,
                 position: "absolute",
                 zIndex: 1000,
-                left: this.state.evtX - this.state.delta[0],
-                top: this.state.evtY - this.state.delta[1],
+                left: this.state.evtX - this.state.innerShift[0],
+                top: this.state.evtY - this.state.innerShift[1],
                 opacity: 0.8
               }
             },
