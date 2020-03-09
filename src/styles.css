@@ -16,7 +16,28 @@ td {
   padding: 0px;
 }
 
-div {
+.th-container {
+  display: inline-flex;
+  vertical-align: middle;
+  cursor: move;
   padding: 5px;
   border: 1px solid red;
+  border-right: none;
+}
+
+.th-container:last-child {
+  border: 1px solid red;
+}
+
+.th-resizer {
+  width: 3px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  display: inline-flex;
+  vertical-align: middle;
+  cursor: col-resize;
+  user-select: none;
+  background-color: blue;
+  border-top: 1px solid red;
+  border-bottom: 1px solid red;
 }

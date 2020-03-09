@@ -68,14 +68,16 @@ export default class Draggable extends React.Component {
     if (this.state.enabled) {
       if (!this.state.isReadyForDrag && !this.state.isDraging) {
         let box = this.refs.refdnd.getBoundingClientRect();
+        let position = this.refs.refdnd.style.position;
+        let positionDelta = position === "" ? [box.x, box.y] : [0, 0];
         this.setState({
           isReadyForDrag: true,
           isDraging: false,
           evtX: _x,
           evtY: _y,
           innerShift: [
-            this.state.xAxisMove ? (_x - box.x) : 0,
-            this.state.yAxisMove ? (_y - box.y) : 0
+            this.state.xAxisMove ? (_x - positionDelta[0]) : 0,
+            this.state.yAxisMove ? (_y - positionDelta[1]) : 0
           ]
         });
       }
@@ -156,7 +158,7 @@ export default class Draggable extends React.Component {
   onMouseDown(event) {
     event.persist();
     event.preventDefault();
-    this.start(event.clientX, event.clientY);
+    this.start(event.pageX, event.pageY);
   }
 
   onMouseUp(event) {
@@ -196,6 +198,7 @@ export default class Draggable extends React.Component {
       {
         ref: "refdnd",
         id: this.props.id,
+        className: this.props.className,
         style: this.props.style,
         onMouseDown: event => this.onMouseDown(event),
         onTouchStart: event => this.onTouchStart(event),
@@ -208,6 +211,7 @@ export default class Draggable extends React.Component {
             {
               id: "dnd",
               key: "dnd",
+              className: this.props.className,
               style: {
                 ...this.props.style,
                 position: "absolute",

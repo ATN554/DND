@@ -21,8 +21,9 @@ export default class App extends React.Component {
             <Droppable id="D1" type="th">
               <Draggable 
                 id="K1" 
-                type="div" 
-                axis="horizontal" 
+                type="div"
+                axis="horizontal"
+                className="th-container"
                 onDragStart={(idFrom, x, y)=>{console.log("start", idFrom, x, y); this.setState({k1_xs: x});}}
                 onDragEnd={(idFrom, idTo, x, y)=>{console.log("end", idFrom, idTo, x, y)}}
                 onDragCancel={(idFrom, x, y)=>{console.log("cancel", idFrom, x, y)}}
@@ -30,11 +31,20 @@ export default class App extends React.Component {
               >
                 Col 1
               </Draggable>
+              <Draggable
+                id="R1"
+                type="div"
+                className="th-resizer"
+                axis="horizontal"
+              >
+                &nbsp;
+              </Draggable>
             </Droppable>
             <Droppable id="D2" type="th">
               <Draggable 
                 id="K2" 
                 type="div"
+                className="th-container"
                 onDragStart={(idFrom, x, y)=>{console.log("start", idFrom, x, y)}}
                 onDragEnd={(idFrom, idTo, x, y)=>{console.log("end", idFrom, idTo, x, y)}}
                 onDragCancel={(idFrom, x, y)=>{console.log("cancel", idFrom, x, y)}}
@@ -42,11 +52,20 @@ export default class App extends React.Component {
               >
                 Col 2
               </Draggable>
+              <Draggable
+                id="R1"
+                type="div"
+                className="th-resizer"
+                axis="horizontal"
+              >
+                &nbsp;
+              </Draggable>
             </Droppable>
             <Droppable id="D3" type="th">
               <Draggable 
                 id="K3" 
-                type="div" 
+                type="div"
+                className="th-container"
                 axis="vertical"
                 onDragStart={(idFrom, x, y)=>{console.log("start", idFrom, x, y); this.setState({k3_ys: y});}}
                 onDragEnd={(idFrom, idTo, x, y)=>{console.log("end", idFrom, idTo, x, y)}}
@@ -59,36 +78,27 @@ export default class App extends React.Component {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>A</td>
-            <td>B</td>
-            <td>C</td>
-          </tr>
-          <tr>
-            <td>A</td>
-            <td>B</td>
-            <td>C</td>
-          </tr>
-          <tr>
-            <td>A</td>
-            <td>B</td>
-            <td>C</td>
-          </tr>
-          <tr>
-            <td>A</td>
-            <td>B</td>
-            <td>C</td>
-          </tr>
-          <tr>
-            <td>A</td>
-            <td>B</td>
-            <td>C</td>
-          </tr>
-          <tr>
-            <td>A</td>
-            <td>B</td>
-            <td>C</td>
-          </tr>
+          <tr><td>A</td><td>B</td><td>C</td></tr>
+          <tr><td>A</td><td>B</td><td>C</td></tr>
+          <tr><td>A</td><td>B</td><td>C</td></tr>
+          <tr><td>A</td><td>B</td><td>C</td></tr>
+          <tr><td>A</td><td>B</td><td>C</td></tr>
+          <tr><td>A</td><td>B</td><td>C</td></tr>
+          <tr><td>A</td><td>B</td><td>C</td></tr>
+          <tr><td>A</td><td>B</td><td>C</td></tr>
+          <tr><td>A</td><td>B</td><td>C</td></tr>
+          <tr><td>A</td><td>B</td><td>C</td></tr>
+          <tr><td>A</td><td>B</td><td>C</td></tr>
+          <tr><td>A</td><td>B</td><td>C</td></tr>
+          <tr><td>A</td><td>B</td><td>C</td></tr>
+          <tr><td>A</td><td>B</td><td>C</td></tr>
+          <tr><td>A</td><td>B</td><td>C</td></tr>
+          <tr><td>A</td><td>B</td><td>C</td></tr>
+          <tr><td>A</td><td>B</td><td>C</td></tr>
+          <tr><td>A</td><td>B</td><td>C</td></tr>
+          <tr><td>A</td><td>B</td><td>C</td></tr>
+          <tr><td>A</td><td>B</td><td>C</td></tr>
+          <tr><td>A</td><td>B</td><td>C</td></tr>
         </tbody>
       </table>
     );
