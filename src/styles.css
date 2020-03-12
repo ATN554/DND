@@ -17,7 +17,7 @@ td {
 }
 
 .th-container {
-  display: inline-flex;
+  display: inline-block;
   vertical-align: middle;
   cursor: move;
   padding: 5px;
@@ -30,10 +30,11 @@ td {
 }
 
 .th-resizer {
+  display: inline-block;
+  vertical-align: middle;
   width: 3px;
   padding-top: 5px;
   padding-bottom: 5px;
-  display: inline-flex;
   vertical-align: middle;
   cursor: col-resize;
   user-select: none;

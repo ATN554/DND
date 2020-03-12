@@ -10,7 +10,7 @@ export default class Draggable extends React.Component {
     let enabled = this.props.enabled === undefined ? true : this.props.enabled;
 
     this.state = {
-      element: this.props.children,
+      elements: this.props.children,
       isReadyForDrag: false,
       isDraging: false,
       evtX: 0,
@@ -38,11 +38,6 @@ export default class Draggable extends React.Component {
   }
 
   componentDidMount() {
-    let box = this.refs.refdnd.getBoundingClientRect();
-    this.setState({
-      position: [box.x, box.y],
-    });
-
     window.addEventListener("mouseup", this.onMouseUp);
     window.addEventListener("mousemove", this.onMouseMove);
     window.addEventListener("touchend", this.onTouchEnd);
@@ -63,11 +58,11 @@ export default class Draggable extends React.Component {
   }
 
   start(x, y) {
-    let _x = this.state.xAxisMove ? x : this.state.position[0];
-    let _y = this.state.yAxisMove ? y : this.state.position[1];
     if (this.state.enabled) {
       if (!this.state.isReadyForDrag && !this.state.isDraging) {
         let box = this.refs.refdnd.getBoundingClientRect();
+        let _x = this.state.xAxisMove ? x : box.x;
+        let _y = this.state.yAxisMove ? y : box.y;
         let position = this.refs.refdnd.style.position;
         let positionDelta = position === "" ? [box.x, box.y] : [0, 0];
         this.setState({
@@ -75,6 +70,7 @@ export default class Draggable extends React.Component {
           isDraging: false,
           evtX: _x,
           evtY: _y,
+          position: [box.x, box.y],
           innerShift: [
             this.state.xAxisMove ? (_x - positionDelta[0]) : 0,
             this.state.yAxisMove ? (_y - positionDelta[1]) : 0
@@ -132,7 +128,7 @@ export default class Draggable extends React.Component {
       if (this.state.isReadyForDrag) {
         this.setState({
             isReadyForDrag: false,
-            isDraging: true,
+            isDraging: true
           },
           function() {
             if (this.props.onDragStart !== undefined) {
@@ -221,7 +217,7 @@ export default class Draggable extends React.Component {
                 opacity: 0.8
               }
             },
-            this.props.children
+            this.state.elements
           )
       ]
     );
