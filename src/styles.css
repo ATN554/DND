@@ -6,10 +6,12 @@
 table {
   border: none;
   border-collapse: collapse;
+  overflow: hidden;
 }
 
 th {
   padding: 0px;
+  border: 1px solid green;
 }
 
 td {
@@ -18,7 +20,6 @@ td {
 
 .th-container {
   display: inline-block;
-  vertical-align: middle;
   cursor: move;
   padding: 5px;
   border: 1px solid red;
@@ -31,11 +32,9 @@ td {
 
 .th-resizer {
   display: inline-block;
-  vertical-align: middle;
   width: 3px;
   padding-top: 5px;
   padding-bottom: 5px;
-  vertical-align: middle;
   cursor: col-resize;
   user-select: none;
   background-color: blue;

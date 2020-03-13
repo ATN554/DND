@@ -13,20 +13,30 @@ export default class ResizableTr extends React.Component {
     let modElements = React.Children.map(elements, (child, idx) => {
       return React.cloneElement(
         child,
-        child.props,
+        { ...child.props, style: { overflow: "hidden", whiteSpace: "nowrap" } },
         [
           child.props.children,
           <Draggable
-            id={"resizable-tr-"+idx}
-            key={"resizable-tr-"+idx}
+            id={"resizable-tr-" + idx}
+            key={"resizable-tr-" + idx}
             type="div"
             className="th-resizer"
             axis="horizontal"
-            onDragStart={(idFrom, x, y)=>{this.onDragStart(idFrom, x, y)}}
-            onDragMove={(idFrom, x, y)=>{this.onDragMove(idFrom, x, y)}}
-            onDragEnd={(idFrom, idTo, x, y)=>{this.onDragStop(idFrom, x, y)}}
-            onDragCancel={(idFrom, x, y)=>{this.onDragStop(idFrom, x, y)}}
-            allowMove={(xs, ys, xe, ye) => {return true}}
+            onDragStart={(idFrom, x, y) => {
+              this.onDragStart(idFrom, x, y);
+            }}
+            onDragMove={(idFrom, x, y) => {
+              this.onDragMove(idFrom, x, y);
+            }}
+            onDragEnd={(idFrom, idTo, x, y) => {
+              this.onDragStop(idFrom, x, y);
+            }}
+            onDragCancel={(idFrom, x, y) => {
+              this.onDragStop(idFrom, x, y);
+            }}
+            allowMove={(xs, ys, xe, ye) => {
+              return true;
+            }}
           >
             &nbsp;
           </Draggable>
@@ -39,7 +49,7 @@ export default class ResizableTr extends React.Component {
       enabled: enabled,
       pageX: undefined,
       curCol: undefined,
-      curColWidth: undefined,
+      curColWidth: undefined
     };
 
     this.onDragStart = this.onDragStart.bind(this);
@@ -49,12 +59,18 @@ export default class ResizableTr extends React.Component {
 
   onDragStart(idFrom, x, y) {
     let elem = document.getElementById(idFrom);
-    let curCol = elem.parentElement;
-console.log(curCol.offsetWidth);
+    let curCol = elem.previousElementSibling; //.parentElement;
+    let cs = getComputedStyle(curCol);
+    let width =
+      curCol.offsetWidth -
+      parseFloat(cs.paddingLeft) -
+      parseFloat(cs.paddingRight) -
+      parseFloat(cs.borderLeftWidth) -
+      parseFloat(cs.borderRightWidth);
     this.setState({
       curCol: curCol,
       pageX: x,
-      curColWidth: curCol.offsetWidth
+      curColWidth: width
     });
   }
 
@@ -62,7 +78,7 @@ console.log(curCol.offsetWidth);
     let curCol = this.state.curCol;
     if (curCol) {
       let diffX = x - this.state.pageX;
-      curCol.style.width = (this.state.curColWidth + diffX)+'px';
+      curCol.style.width = this.state.curColWidth + diffX + "px";
     }
   }
 
@@ -76,13 +92,13 @@ console.log(curCol.offsetWidth);
 
   setEnabled(enabled) {
     if (this.state.enabled !== enabled) {
-      this.setState({enabled: enabled});
+      this.setState({ enabled: enabled });
     }
   }
 
   render() {
     return React.createElement(
-      'tr',
+      "tr",
       {
         ref: "reftrresizer",
         id: this.props.id,
