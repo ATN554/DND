@@ -6,38 +6,31 @@
 table {
   border: none;
   border-collapse: collapse;
-  overflow: hidden;
 }
 
 th {
   padding: 0px;
-  border: 1px solid green;
 }
 
 td {
-  padding: 0px;
+  padding-left: 3px;
+  padding-right: 3px;
 }
 
 .th-container {
-  display: inline-block;
-  cursor: move;
-  padding: 5px;
-  border: 1px solid red;
-  border-right: none;
-}
-
-.th-container:last-child {
-  border: 1px solid red;
+  padding: 3px;
+  border: 1px solid rgb(28, 53, 25);
 }
 
 .th-resizer {
-  display: inline-block;
-  width: 3px;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  cursor: col-resize;
-  user-select: none;
-  background-color: blue;
-  border-top: 1px solid red;
-  border-bottom: 1px solid red;
+  width: 7px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  background-color: white;
+}
+
+.th-resizer:hover, 
+.th-resizer:focus,
+.th-resizer:active {
+  background-color: rgb(81, 177, 72);
 }

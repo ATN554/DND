@@ -9,8 +9,6 @@ export default class App extends React.Component {
     super(props);
 
     this.state = {
-      k1_xs: 0,
-      k3_ys: 0
     };
   }
 
@@ -18,64 +16,68 @@ export default class App extends React.Component {
     return (
       <table>
         <thead>
-          <ResizableTr>
-            <Droppable id="D1" type="th">
+          <ResizableTr maxWidth={250}>
+            <Droppable id="Droppable1" type="th">
               <Draggable
-                id="K1"
+                id="Draggable1"
                 type="div"
                 axis="horizontal"
                 className="th-container"
-                onDragStart={(idFrom, x, y) => {
-                  console.log("start", idFrom, x, y);
-                  this.setState({ k1_xs: x });
-                }}
-                onDragEnd={(idFrom, idTo, x, y) => {
-                  console.log("end", idFrom, idTo, x, y);
-                }}
-                onDragCancel={(idFrom, x, y) => {
-                  console.log("cancel", idFrom, x, y);
-                }}
+                onDragStart={(idFrom, x, y) => {console.log("start", idFrom, x, y);}}
+                onDragEnd={(idFrom, idTo, x, y) => {console.log("end", idFrom, idTo, x, y);}}
+                onDragCancel={(idFrom, x, y) => {console.log("cancel", idFrom, x, y);}}
               >
-                Col 1
+                <table style={{width: "100%"}}>
+                  <tbody>
+                    <tr>
+                      <td style={{width: "100%"}}>Заголовок №1</td>
+                      <td><input style={{padding: "0px", margin: "0px"}} type="button" value="m" onClick={() => alert("Открыть меню")}/></td>
+                      <td><input style={{padding: "0px", margin: "0px"}} type="button" value="g" onClick={() => alert("Добавить в группу")}/></td>
+                    </tr>
+                  </tbody>
+                </table>
               </Draggable>
             </Droppable>
-            <Droppable id="D2" type="th">
+            <Droppable id="Droppable2" type="th">
               <Draggable
-                id="K2"
+                id="Draggable2"
                 type="div"
                 axis="horizontal"
                 className="th-container"
-                onDragStart={(idFrom, x, y) => {
-                  console.log("start", idFrom, x, y);
-                }}
-                onDragEnd={(idFrom, idTo, x, y) => {
-                  console.log("end", idFrom, idTo, x, y);
-                }}
-                onDragCancel={(idFrom, x, y) => {
-                  console.log("cancel", idFrom, x, y);
-                }}
+                onDragStart={(idFrom, x, y) => {console.log("start", idFrom, x, y);}}
+                onDragEnd={(idFrom, idTo, x, y) => {console.log("end", idFrom, idTo, x, y);}}
+                onDragCancel={(idFrom, x, y) => {console.log("cancel", idFrom, x, y);}}
               >
-                Col 2
+                <table style={{width: "100%"}}>
+                  <tbody>
+                    <tr>
+                      <td style={{width: "100%"}}>Колонка №2</td>
+                      <td><input style={{padding: "0px", margin: "0px"}} type="button" value="m" onClick={() => alert("Открыть меню")}/></td>
+                      <td><input style={{padding: "0px", margin: "0px"}} type="button" value="g" onClick={() => alert("Добавить в группу")}/></td>
+                    </tr>
+                  </tbody>
+                </table>
               </Draggable>
             </Droppable>
-            <Droppable id="D3" type="th">
+            <Droppable id="Droppable3" type="th">
               <Draggable
-                id="K3"
+                id="Draggable3"
                 type="div"
                 className="th-container"
                 axis="horizontal"
-                onDragStart={(idFrom, x, y) => {
-                  console.log("start", idFrom, x, y);
-                  this.setState({ k3_ys: y });
-                }}
-                onDragEnd={(idFrom, idTo, x, y) => {
-                  console.log("end", idFrom, idTo, x, y);
-                }}
-                onDragCancel={(idFrom, x, y) => {
-                  console.log("cancel", idFrom, x, y);
-                }}
+                onDragStart={(idFrom, x, y) => {console.log("start", idFrom, x, y);}}
+                onDragEnd={(idFrom, idTo, x, y) => {console.log("end", idFrom, idTo, x, y);}}
+                onDragCancel={(idFrom, x, y) => {console.log("cancel", idFrom, x, y);}}
               >
-                Col 3
+                <table style={{width: "100%"}}>
+                  <tbody>
+                    <tr>
+                      <td style={{width: "100%"}}>Кол. №3</td>
+                      <td><input style={{padding: "0px", margin: "0px"}} type="button" value="m" onClick={() => alert("Открыть меню")}/></td>
+                      <td><input style={{padding: "0px", margin: "0px"}} type="button" value="g" onClick={() => alert("Добавить в группу")}/></td>
+                    </tr>
+                  </tbody>
+                </table>
               </Draggable>
             </Droppable>
           </ResizableTr>
