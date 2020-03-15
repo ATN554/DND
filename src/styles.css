@@ -18,19 +18,39 @@ td {
 }
 
 .th-container {
+  height: 26px;
   padding: 3px;
   border: 1px solid rgb(28, 53, 25);
+  border-right: 1px dashed rgb(28, 53, 25);
+  border-radius: 5px 0 0 5px;
+  background-color: rgb(163, 180, 161);
 }
 
 .th-resizer {
   width: 7px;
+  height: 26px;
   padding-top: 3px;
   padding-bottom: 3px;
-  background-color: white;
+  margin-right: 1px;
+  border-radius: 0 5px 5px 0;
+  border: 1px solid rgb(28, 53, 25);
+  border-left: none;
+  background-color: rgb(163, 180, 161);
 }
 
 .th-resizer:hover, 
 .th-resizer:focus,
 .th-resizer:active {
   background-color: rgb(81, 177, 72);
+}
+
+.th-resizer-img {
+  width: 5px;
+  height: 5px;
+  position: absolute;
+  top: 1px;
+  bottom: 1px;
+  left: 1px;
+  right: 1px;
+  margin: auto;
 }

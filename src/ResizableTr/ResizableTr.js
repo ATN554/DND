@@ -40,7 +40,7 @@ export default class ResizableTr extends React.Component {
             onDragCancel={(idFrom, x, y) => {this.onDragStop(idFrom, x, y);}}
             allowMove={(idFrom, xs, ys, xe, ye) => {return this.allowMove(idFrom, xs, ys, xe, ye);}}
           >
-          |
+            {this.props.resizer}
           </Draggable>
         ]
       );
