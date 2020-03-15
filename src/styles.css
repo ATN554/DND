@@ -18,7 +18,7 @@ td {
 }
 
 .th-container {
-  height: 26px;
+  height: 20px;
   padding: 3px;
   border: 1px solid rgb(28, 53, 25);
   border-right: 1px dashed rgb(28, 53, 25);
@@ -34,7 +34,7 @@ td {
 
 .th-resizer {
   width: 7px;
-  height: 26px;
+  height: 20px;
   padding-top: 3px;
   padding-bottom: 3px;
   margin-right: 1px;
