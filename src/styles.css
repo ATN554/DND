@@ -26,6 +26,12 @@ td {
   background-color: rgb(163, 180, 161);
 }
 
+.th-container:hover, 
+.th-container:focus,
+.th-container:active {
+  background-color: rgb(183, 216, 180);
+}
+
 .th-resizer {
   width: 7px;
   height: 26px;
@@ -41,7 +47,7 @@ td {
 .th-resizer:hover, 
 .th-resizer:focus,
 .th-resizer:active {
-  background-color: rgb(81, 177, 72);
+  background-color: rgb(183, 216, 180);
 }
 
 .th-resizer-img {

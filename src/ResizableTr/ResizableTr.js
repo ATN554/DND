@@ -31,6 +31,7 @@ export default class ResizableTr extends React.Component {
             id={"resizable-th-" + idx}
             key={"resizable-th-" + idx}
             type="div"
+            showClone={false}
             className="th-resizer"
             style={{cursor: 'col-resize', userSelect: 'none', display: 'inline-block', verticalAlign: 'middle'}}
             axis="horizontal"

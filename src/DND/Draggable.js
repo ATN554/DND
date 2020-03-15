@@ -8,11 +8,15 @@ export default class Draggable extends React.Component {
 
     let axis = this.props.axis === undefined ? "both" : this.props.axis;
     let enabled = this.props.enabled === undefined ? true : this.props.enabled;
+    let showClone = this.props.showClone !== undefined ? this.props.showClone : true;
+    let cloneOpacity = this.props.cloneOpacity !== undefined ? this.props.cloneOpacity : 0.8;
 
     this.state = {
       elements: this.props.children,
       isReadyForDrag: false,
       isDraging: false,
+      showClone: showClone,
+      cloneOpacity: cloneOpacity,
       evtX: 0,
       evtY: 0,
       position: [0, 0],
@@ -230,6 +234,7 @@ export default class Draggable extends React.Component {
       },
       [
         this.props.children,
+        this.state.showClone && 
         this.state.isDraging &&
           React.createElement(
             "div",
@@ -245,7 +250,7 @@ export default class Draggable extends React.Component {
                 top: this.state.evtY - this.state.innerShift[1],
                 width: this.state.size[0] + "px",
                 height: this.state.size[1] + "px",
-                opacity: 0.8
+                opacity: this.state.cloneOpacity
               }
             },
             this.state.elements
