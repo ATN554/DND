@@ -22,6 +22,8 @@ export default class App extends React.Component {
 
   render() {
     return (
+      <div style={{ position: "absolute" }}>
+      <div style={{ position: "static" }}>
       <table>
         <thead>
           <ResizableTr 
@@ -201,6 +203,8 @@ export default class App extends React.Component {
           </tr>
         </tbody>
       </table>
+      </div>
+      </div>
     );
   }
 }

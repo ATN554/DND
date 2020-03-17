@@ -38,6 +38,8 @@ export default class Draggable extends React.Component {
     this.start = this.start.bind(this);
     this.stop = this.stop.bind(this);
     this.move = this.move.bind(this);
+
+    this.findPos = this.findPos.bind(this);
   }
 
   componentDidMount() {
@@ -58,15 +60,29 @@ export default class Draggable extends React.Component {
     document.removeEventListener("touchmove", this.onTouchMove);
   }
 
+  findPos(obj) {
+    let curleft = -window.pageXOffset;
+    let curtop = -window.pageYOffset;
+    if (obj.offsetParent) {
+      let cs = getComputedStyle(this.refs.refdnd);
+      curleft = obj.offsetLeft - parseFloat(cs.marginLeft);
+      curtop = obj.offsetTop - parseFloat(cs.marginTop);
+      while (obj) {
+        let cs = getComputedStyle(this.refs.refdnd);
+        curleft += obj.offsetLeft - parseFloat(cs.marginLeft);
+        curtop += obj.offsetTop - parseFloat(cs.marginTop);
+        obj = obj.offsetParent;
+      }
+    }
+    return [curleft, curtop];
+  }
+
   start(x, y) {
     if (this.state.enabled) {
       if (!this.state.isReadyForDrag && !this.state.isDraging) {
         let box = this.refs.refdnd.getBoundingClientRect();
+        let pos = this.findPos(this.refs.refdnd);
         let cs = getComputedStyle(this.refs.refdnd);
-        let pos = [
-          box.x + window.pageXOffset - parseFloat(cs.marginLeft),
-          box.y + window.pageYOffset - parseFloat(cs.marginTop)
-        ];
         let size = [
           box.width -
             parseFloat(cs.paddingLeft) -
@@ -240,25 +256,25 @@ export default class Draggable extends React.Component {
         this.props.children,
         this.state.showClone && 
         this.state.isDraging &&
-          React.createElement(
-            "div",
-            {
-              id: "dnd",
-              key: "dnd",
-              className: this.props.className,
-              style: {
-                ...this.props.style,
-                position: "absolute",
-                zIndex: 1000,
-                left: this.state.evtX - this.state.innerShift[0],
-                top: this.state.evtY - this.state.innerShift[1],
-                width: this.state.size[0] + "px",
-                height: this.state.size[1] + "px",
-                opacity: this.state.cloneOpacity
-              }
-            },
-            this.state.elements
-          )
+        React.createElement(
+          "div",
+          {
+            id: "dnd",
+            key: "dnd",
+            className: this.props.className,
+            style: {
+              ...this.props.style,
+              position: "fixed",
+              zIndex: 1000,
+              left: this.state.evtX - this.state.innerShift[0],
+              top: this.state.evtY - this.state.innerShift[1],
+              width: this.state.size[0] + "px",
+              height: this.state.size[1] + "px",
+              opacity: this.state.cloneOpacity
+            }
+          },
+          this.state.elements
+        )
       ]
     );
   }
