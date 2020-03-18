@@ -8,8 +8,10 @@ export default class Draggable extends React.Component {
 
     let axis = this.props.axis === undefined ? "both" : this.props.axis;
     let enabled = this.props.enabled === undefined ? true : this.props.enabled;
-    let showClone = this.props.showClone !== undefined ? this.props.showClone : true;
-    let cloneOpacity = this.props.cloneOpacity !== undefined ? this.props.cloneOpacity : 0.8;
+    let showClone =
+      this.props.showClone !== undefined ? this.props.showClone : true;
+    let cloneOpacity =
+      this.props.cloneOpacity !== undefined ? this.props.cloneOpacity : 0.8;
 
     this.state = {
       elements: this.props.children,
@@ -61,18 +63,13 @@ export default class Draggable extends React.Component {
   }
 
   findPos(obj) {
-    let curleft = -window.pageXOffset;
-    let curtop = -window.pageYOffset;
-    if (obj.offsetParent) {
-      let cs = getComputedStyle(this.refs.refdnd);
-      curleft = obj.offsetLeft - parseFloat(cs.marginLeft);
-      curtop = obj.offsetTop - parseFloat(cs.marginTop);
-      while (obj) {
-        let cs = getComputedStyle(this.refs.refdnd);
-        curleft += obj.offsetLeft - parseFloat(cs.marginLeft);
-        curtop += obj.offsetTop - parseFloat(cs.marginTop);
-        obj = obj.offsetParent;
-      }
+    let curleft = obj.offsetLeft - window.pageXOffset;
+    let curtop = obj.offsetTop - window.pageYOffset;
+    obj = obj.offsetParent;
+    while (obj) {
+      curleft += obj.offsetLeft;
+      curtop += obj.offsetTop;
+      obj = obj.offsetParent;
     }
     return [curleft, curtop];
   }
@@ -182,7 +179,13 @@ export default class Draggable extends React.Component {
     } else if (this.state.isDraging) {
       let allowMove = true;
       if (this.props.allowMove !== undefined) {
-        allowMove = this.props.allowMove(this.props.id, this.state.evtX, this.state.evtY, _x, _y);
+        allowMove = this.props.allowMove(
+          this.props.id,
+          this.state.evtX,
+          this.state.evtY,
+          _x,
+          _y
+        );
       }
       if (allowMove) {
         this.setState(
@@ -248,33 +251,33 @@ export default class Draggable extends React.Component {
         ref: "refdnd",
         id: this.props.id,
         className: this.props.className,
-        style: {cursor: 'move', ...this.props.style},
+        style: { cursor: "move", ...this.props.style },
         onMouseDown: event => this.onMouseDown(event),
         onTouchStart: event => this.onTouchStart(event)
       },
       [
         this.props.children,
-        this.state.showClone && 
-        this.state.isDraging &&
-        React.createElement(
-          "div",
-          {
-            id: "dnd",
-            key: "dnd",
-            className: this.props.className,
-            style: {
-              ...this.props.style,
-              position: "fixed",
-              zIndex: 1000,
-              left: this.state.evtX - this.state.innerShift[0],
-              top: this.state.evtY - this.state.innerShift[1],
-              width: this.state.size[0] + "px",
-              height: this.state.size[1] + "px",
-              opacity: this.state.cloneOpacity
-            }
-          },
-          this.state.elements
-        )
+        this.state.showClone &&
+          this.state.isDraging &&
+          React.createElement(
+            "div",
+            {
+              id: "dnd",
+              key: "dnd",
+              className: this.props.className,
+              style: {
+                ...this.props.style,
+                position: "fixed",
+                zIndex: 1000,
+                left: this.state.evtX - this.state.innerShift[0],
+                top: this.state.evtY - this.state.innerShift[1],
+                width: this.state.size[0] + "px",
+                height: this.state.size[1] + "px",
+                opacity: this.state.cloneOpacity
+              }
+            },
+            this.state.elements
+          )
       ]
     );
   }
