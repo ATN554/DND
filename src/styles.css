@@ -24,9 +24,10 @@ td {
   border-right: 1px dashed rgb(28, 53, 25);
   border-radius: 5px 0 0 5px;
   background-color: rgb(163, 180, 161);
+  cursor: move;
 }
 
-.th-container:hover, 
+.th-container:hover,
 .th-container:focus,
 .th-container:active {
   background-color: rgb(183, 216, 180);
@@ -44,7 +45,7 @@ td {
   background-color: rgb(163, 180, 161);
 }
 
-.th-resizer:hover, 
+.th-resizer:hover,
 .th-resizer:focus,
 .th-resizer:active {
   background-color: rgb(183, 216, 180);
