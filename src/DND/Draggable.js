@@ -22,6 +22,7 @@ export default class Draggable extends React.Component {
       evtX: 0,
       evtY: 0,
       position: [0, 0],
+      deltaPos: [0, 0],
       size: [0, 0],
       innerShift: [0, 0],
       xAxisMove: axis === "horizontal" || axis === "both",
@@ -63,23 +64,22 @@ export default class Draggable extends React.Component {
   }
 
   findPos(obj) {
-    let curleft = obj.offsetLeft - window.pageXOffset;
-    let curtop = obj.offsetTop - window.pageYOffset;
-    obj = obj.offsetParent;
-    while (obj) {
-      curleft += obj.offsetLeft;
-      curtop += obj.offsetTop;
-      obj = obj.offsetParent;
-    }
-    return [curleft, curtop];
+    let box = obj.getBoundingClientRect();
+    return [box.left + window.pageXOffset, box.top + window.pageYOffset];
   }
 
   start(x, y) {
     if (this.state.enabled) {
       if (!this.state.isReadyForDrag && !this.state.isDraging) {
         let box = this.refs.refdnd.getBoundingClientRect();
-        let pos = this.findPos(this.refs.refdnd);
         let cs = getComputedStyle(this.refs.refdnd);
+        let selfPos = this.findPos(this.refs.refdnd);
+        this.refs.refdndclone.style.left = selfPos[0] + "px";
+        this.refs.refdndclone.style.top = selfPos[1] + "px";
+        let clonePos = this.findPos(this.refs.refdndclone);
+        this.refs.refdndclone.style.left = "0px";
+        this.refs.refdndclone.style.top = "0px";
+        let deltaPos = [selfPos[0] - clonePos[0], selfPos[1] - clonePos[1]];
         let size = [
           box.width -
             parseFloat(cs.paddingLeft) -
@@ -92,18 +92,19 @@ export default class Draggable extends React.Component {
             parseFloat(cs.borderTopWidth) -
             parseFloat(cs.borderBottomWidth)
         ];
-        let _x = this.state.xAxisMove ? x : pos[0];
-        let _y = this.state.yAxisMove ? y : pos[1];
+        let _x = this.state.xAxisMove ? x : selfPos[0];
+        let _y = this.state.yAxisMove ? y : selfPos[1];
         this.setState({
           isReadyForDrag: true,
           isDraging: false,
           evtX: _x,
           evtY: _y,
-          position: pos,
+          position: selfPos,
+          deltaPos: deltaPos,
           size: size,
           innerShift: [
-            this.state.xAxisMove ? _x - pos[0] : 0,
-            this.state.yAxisMove ? _y - pos[1] : 0
+            this.state.xAxisMove ? _x - selfPos[0] : 0,
+            this.state.yAxisMove ? _y - selfPos[1] : 0
           ]
         });
       }
@@ -116,40 +117,35 @@ export default class Draggable extends React.Component {
         isReadyForDrag: false
       });
     } else if (this.state.isDraging) {
+      let endPos = [this.state.evtX, this.state.evtY];
       this.setState(
         {
-          isDraging: false
+          isDraging: false,
+          evtX: 0,
+          evtY: 0,
+          position: [0, 0],
+          deltaPos: [0, 0],
+          size: [0, 0],
+          innerShift: [0, 0]
         },
         function() {
-          let target = document.elementFromPoint(
-            this.state.evtX,
-            this.state.evtY
-          );
+          let target = document.elementFromPoint(endPos[0], endPos[1]);
           let idFrom = this.props.id;
           if (target) {
             let droppable = target.closest(".droppable");
             if (droppable) {
               let idTo = droppable.id;
               if (this.props.onDragEnd !== undefined) {
-                this.props.onDragEnd(
-                  idFrom,
-                  idTo,
-                  this.state.evtX,
-                  this.state.evtY
-                );
+                this.props.onDragEnd(idFrom, idTo, endPos[0], endPos[1]);
               }
             } else {
               if (this.props.onDragCancel !== undefined) {
-                this.props.onDragCancel(
-                  idFrom,
-                  this.state.evtX,
-                  this.state.evtY
-                );
+                this.props.onDragCancel(idFrom, endPos[0], endPos[1]);
               }
             }
           } else {
             if (this.props.onDragCancel !== undefined) {
-              this.props.onDragCancel(idFrom, this.state.evtX, this.state.evtY);
+              this.props.onDragCancel(idFrom, endPos[0], endPos[1]);
             }
           }
         }
@@ -257,27 +253,39 @@ export default class Draggable extends React.Component {
       },
       [
         this.props.children,
-        this.state.showClone &&
-          this.state.isDraging &&
-          React.createElement(
-            "div",
-            {
-              id: "dnd",
-              key: "dnd",
-              className: this.props.className,
-              style: {
-                ...this.props.style,
-                position: "fixed",
-                zIndex: 1000,
-                left: this.state.evtX - this.state.innerShift[0],
-                top: this.state.evtY - this.state.innerShift[1],
-                width: this.state.size[0] + "px",
-                height: this.state.size[1] + "px",
-                opacity: this.state.cloneOpacity
-              }
-            },
-            this.state.elements
-          )
+        React.createElement(
+          "div",
+          {
+            ref: "refdndclone",
+            id: "dnd",
+            key: "dnd",
+            className: this.props.className,
+            style: {
+              ...this.props.style,
+              position: "absolute",
+              visibility:
+                this.state.showClone && this.state.isDraging
+                  ? "visible"
+                  : "hidden",
+              margin: "0px",
+              zIndex: 1000,
+              left:
+                this.state.evtX +
+                this.state.deltaPos[0] -
+                this.state.innerShift[0] +
+                "px",
+              top:
+                this.state.evtY +
+                this.state.deltaPos[1] -
+                this.state.innerShift[1] +
+                "px",
+              width: this.state.size[0] + "px",
+              height: this.state.size[1] + "px",
+              opacity: this.state.cloneOpacity
+            }
+          },
+          this.state.elements
+        )
       ]
     );
   }
