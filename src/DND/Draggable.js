@@ -6,6 +6,7 @@ export default class Draggable extends React.Component {
 
     this.ref = null;
 
+    let droppable = this.props.droppable === undefined ? "droppable" : this.props.droppable;
     let axis = this.props.axis === undefined ? "both" : this.props.axis;
     let enabled = this.props.enabled === undefined ? true : this.props.enabled;
     let showClone =
@@ -14,6 +15,7 @@ export default class Draggable extends React.Component {
       this.props.cloneOpacity !== undefined ? this.props.cloneOpacity : 0.8;
 
     this.state = {
+      droppable: droppable,
       elements: this.props.children,
       isReadyForDrag: false,
       isDraging: false,
@@ -82,15 +84,15 @@ export default class Draggable extends React.Component {
         let deltaPos = [selfPos[0] - clonePos[0], selfPos[1] - clonePos[1]];
         let size = [
           box.width -
-            parseFloat(cs.paddingLeft) -
-            parseFloat(cs.paddingRight) -
-            parseFloat(cs.borderLeftWidth) -
-            parseFloat(cs.borderRightWidth),
+          parseFloat(cs.paddingLeft) -
+          parseFloat(cs.paddingRight) -
+          parseFloat(cs.borderLeftWidth) -
+          parseFloat(cs.borderRightWidth),
           box.height -
-            parseFloat(cs.paddingTop) -
-            parseFloat(cs.paddingBottom) -
-            parseFloat(cs.borderTopWidth) -
-            parseFloat(cs.borderBottomWidth)
+          parseFloat(cs.paddingTop) -
+          parseFloat(cs.paddingBottom) -
+          parseFloat(cs.borderTopWidth) -
+          parseFloat(cs.borderBottomWidth)
         ];
         let _x = this.state.xAxisMove ? x : selfPos[0];
         let _y = this.state.yAxisMove ? y : selfPos[1];
@@ -128,11 +130,12 @@ export default class Draggable extends React.Component {
           size: [0, 0],
           innerShift: [0, 0]
         },
-        function() {
+        function () {
+          this.refs.refdndclone.visibility = "hidden";
           let target = document.elementFromPoint(endPos[0], endPos[1]);
           let idFrom = this.props.id;
           if (target) {
-            let droppable = target.closest(".droppable");
+            let droppable = target.closest("." + this.state.droppable);
             if (droppable) {
               let idTo = droppable.id;
               if (this.props.onDragEnd !== undefined) {
@@ -162,7 +165,7 @@ export default class Draggable extends React.Component {
           isReadyForDrag: false,
           isDraging: true
         },
-        function() {
+        function () {
           if (this.props.onDragStart !== undefined) {
             this.props.onDragStart(
               this.props.id,
@@ -189,7 +192,7 @@ export default class Draggable extends React.Component {
             evtX: _x,
             evtY: _y
           },
-          function() {
+          function () {
             if (this.props.onDragMove !== undefined) {
               this.props.onDragMove(
                 this.props.id,
