@@ -1,35 +1,19 @@
 import React from "react";
+import getUID from "../UID/uid.js";
 
 export default class Draggable extends React.Component {
   constructor(props) {
     super(props);
 
-    this.ref = null;
-
-    let droppable = this.props.droppable === undefined ? "droppable" : this.props.droppable;
-    let axis = this.props.axis === undefined ? "both" : this.props.axis;
-    let enabled = this.props.enabled === undefined ? true : this.props.enabled;
-    let showClone =
-      this.props.showClone !== undefined ? this.props.showClone : true;
-    let cloneOpacity =
-      this.props.cloneOpacity !== undefined ? this.props.cloneOpacity : 0.8;
-
     this.state = {
-      droppable: droppable,
-      elements: this.props.children,
+      dndcloneId: getUID(),
       isReadyForDrag: false,
       isDraging: false,
-      showClone: showClone,
-      cloneOpacity: cloneOpacity,
-      evtX: 0,
-      evtY: 0,
-      position: [0, 0],
+      eventPos: [0, 0],
+      selfPos: [0, 0],
       deltaPos: [0, 0],
       size: [0, 0],
-      innerShift: [0, 0],
-      xAxisMove: axis === "horizontal" || axis === "both",
-      yAxisMove: axis === "vertical" || axis === "both",
-      enabled: enabled
+      innerShift: [0, 0]
     };
 
     this.onMouseDown = this.onMouseDown.bind(this);
@@ -45,6 +29,7 @@ export default class Draggable extends React.Component {
     this.move = this.move.bind(this);
 
     this.findPos = this.findPos.bind(this);
+    this.findDroppable = this.findDroppable.bind(this);
   }
 
   componentDidMount() {
@@ -71,80 +56,98 @@ export default class Draggable extends React.Component {
   }
 
   start(x, y) {
-    if (this.state.enabled) {
+    let enabled = this.props.enabled === undefined ? true : this.props.enabled;
+    if (enabled) {
       if (!this.state.isReadyForDrag && !this.state.isDraging) {
         let box = this.refs.refdnd.getBoundingClientRect();
         let cs = getComputedStyle(this.refs.refdnd);
         let selfPos = this.findPos(this.refs.refdnd);
-        this.refs.refdndclone.style.left = selfPos[0] + "px";
-        this.refs.refdndclone.style.top = selfPos[1] + "px";
-        let clonePos = this.findPos(this.refs.refdndclone);
+        let oldPos = [
+          this.refs.refdndclone.style.left,
+          this.refs.refdndclone.style.top
+        ];
         this.refs.refdndclone.style.left = "0px";
         this.refs.refdndclone.style.top = "0px";
-        let deltaPos = [selfPos[0] - clonePos[0], selfPos[1] - clonePos[1]];
+        let clonePos = this.findPos(this.refs.refdndclone);
+        this.refs.refdndclone.style.left = oldPos[0];
+        this.refs.refdndclone.style.top = oldPos[1];
+        let deltaPos = [-clonePos[0], -clonePos[1]];
         let size = [
           box.width -
-          parseFloat(cs.paddingLeft) -
-          parseFloat(cs.paddingRight) -
-          parseFloat(cs.borderLeftWidth) -
-          parseFloat(cs.borderRightWidth),
+            parseFloat(cs.paddingLeft) -
+            parseFloat(cs.paddingRight) -
+            parseFloat(cs.borderLeftWidth) -
+            parseFloat(cs.borderRightWidth),
           box.height -
-          parseFloat(cs.paddingTop) -
-          parseFloat(cs.paddingBottom) -
-          parseFloat(cs.borderTopWidth) -
-          parseFloat(cs.borderBottomWidth)
+            parseFloat(cs.paddingTop) -
+            parseFloat(cs.paddingBottom) -
+            parseFloat(cs.borderTopWidth) -
+            parseFloat(cs.borderBottomWidth)
         ];
-        let _x = this.state.xAxisMove ? x : selfPos[0];
-        let _y = this.state.yAxisMove ? y : selfPos[1];
+        let axis = this.props.axis || "both";
+        let xAxisMove = axis === "horizontal" || axis === "both";
+        let yAxisMove = axis === "vertical" || axis === "both";
+        let _x = xAxisMove ? x : selfPos[0];
+        let _y = yAxisMove ? y : selfPos[1];
         this.setState({
           isReadyForDrag: true,
           isDraging: false,
-          evtX: _x,
-          evtY: _y,
-          position: selfPos,
+          eventPos: [_x, _y],
+          selfPos: selfPos,
           deltaPos: deltaPos,
           size: size,
           innerShift: [
-            this.state.xAxisMove ? _x - selfPos[0] : 0,
-            this.state.yAxisMove ? _y - selfPos[1] : 0
+            xAxisMove ? _x - selfPos[0] : 0,
+            yAxisMove ? _y - selfPos[1] : 0
           ]
         });
       }
     }
   }
 
-  stop() {
+  findDroppable(x, y) {
+    let target = document.elementFromPoint(x, y);
+    if (target) {
+      let droppable = this.props.droppable || "droppable";
+      return target.closest("." + droppable);
+    }
+    return undefined;
+  }
+
+  stop(x, y) {
     if (this.state.isReadyForDrag) {
       this.setState({
         isReadyForDrag: false
       });
     } else if (this.state.isDraging) {
-      let endPos = [this.state.evtX, this.state.evtY];
+      let endPos = [this.state.eventPos[0], this.state.eventPos[1]];
+      let centerPos = [
+        this.state.eventPos[0] + this.state.size[0] / 2,
+        this.state.eventPos[1] + this.state.size[1] / 2
+      ];
       this.setState(
         {
           isDraging: false,
-          evtX: 0,
-          evtY: 0,
-          position: [0, 0],
+          eventPos: [0, 0],
+          selfPos: [0, 0],
           deltaPos: [0, 0],
           size: [0, 0],
           innerShift: [0, 0]
         },
-        function () {
+        function() {
           this.refs.refdndclone.visibility = "hidden";
-          let target = document.elementFromPoint(endPos[0], endPos[1]);
           let idFrom = this.props.id;
-          if (target) {
-            let droppable = target.closest("." + this.state.droppable);
-            if (droppable) {
-              let idTo = droppable.id;
-              if (this.props.onDragEnd !== undefined) {
-                this.props.onDragEnd(idFrom, idTo, endPos[0], endPos[1]);
-              }
-            } else {
-              if (this.props.onDragCancel !== undefined) {
-                this.props.onDragCancel(idFrom, endPos[0], endPos[1]);
-              }
+          let droppable = this.findDroppable(x, y);
+          if (!droppable) {
+            droppable = this.findDroppable(endPos[0], endPos[1]);
+            if (!droppable) {
+              droppable = this.findDroppable(centerPos[0], centerPos[1]);
+            }
+          }
+          if (droppable) {
+            let idTo = droppable.id;
+            if (this.props.onDragEnd !== undefined) {
+              this.props.onDragEnd(idFrom, idTo, endPos[0], endPos[1]);
             }
           } else {
             if (this.props.onDragCancel !== undefined) {
@@ -157,20 +160,23 @@ export default class Draggable extends React.Component {
   }
 
   move(x, y) {
-    let _x = this.state.xAxisMove ? x : this.state.position[0];
-    let _y = this.state.yAxisMove ? y : this.state.position[1];
+    let axis = this.props.axis || "both";
+    let xAxisMove = axis === "horizontal" || axis === "both";
+    let yAxisMove = axis === "vertical" || axis === "both";
+    let _x = xAxisMove ? x : this.state.selfPos[0];
+    let _y = yAxisMove ? y : this.state.selfPos[1];
     if (this.state.isReadyForDrag) {
       this.setState(
         {
           isReadyForDrag: false,
           isDraging: true
         },
-        function () {
+        function() {
           if (this.props.onDragStart !== undefined) {
             this.props.onDragStart(
               this.props.id,
-              this.state.evtX,
-              this.state.evtY
+              this.state.eventPos[0],
+              this.state.eventPos[1]
             );
           }
         }
@@ -180,24 +186,34 @@ export default class Draggable extends React.Component {
       if (this.props.allowMove !== undefined) {
         allowMove = this.props.allowMove(
           this.props.id,
-          this.state.evtX,
-          this.state.evtY,
+          this.state.eventPos[0],
+          this.state.eventPos[1],
           _x,
           _y
         );
       }
       if (allowMove) {
+        let oldPos = [
+          this.refs.refdndclone.style.left,
+          this.refs.refdndclone.style.top
+        ];
+        this.refs.refdndclone.style.left = "0px";
+        this.refs.refdndclone.style.top = "0px";
+        let clonePos = this.findPos(this.refs.refdndclone);
+        this.refs.refdndclone.style.left = oldPos[0];
+        this.refs.refdndclone.style.top = oldPos[1];
+        let deltaPos = [-clonePos[0], -clonePos[1]];
         this.setState(
           {
-            evtX: _x,
-            evtY: _y
+            eventPos: [_x, _y],
+            deltaPos: deltaPos
           },
-          function () {
+          function() {
             if (this.props.onDragMove !== undefined) {
               this.props.onDragMove(
                 this.props.id,
-                this.state.evtX,
-                this.state.evtY
+                this.state.eventPos[0],
+                this.state.eventPos[1]
               );
             }
           }
@@ -214,7 +230,7 @@ export default class Draggable extends React.Component {
 
   onMouseUp(event) {
     event.preventDefault();
-    this.stop();
+    this.stop(event.pageX, event.pageY);
   }
 
   onMouseMove(event) {
@@ -232,7 +248,10 @@ export default class Draggable extends React.Component {
 
   onTouchEnd(event) {
     event.preventDefault();
-    this.stop();
+    if (event.changedTouches.length > 0) {
+      let touch = event.changedTouches[0];
+      this.stop(touch.pageX, touch.pageY);
+    }
   }
 
   onTouchMove(event) {
@@ -244,6 +263,9 @@ export default class Draggable extends React.Component {
   }
 
   render() {
+    let showClone =
+      this.props.showClone !== undefined ? this.props.showClone : true;
+    let cloneOpacity = this.props.cloneOpacity || 0.8;
     return React.createElement(
       this.props.type,
       {
@@ -260,34 +282,32 @@ export default class Draggable extends React.Component {
           "div",
           {
             ref: "refdndclone",
-            id: "dnd",
-            key: "dnd",
+            id: this.state.dndcloneId,
+            key: this.state.dndcloneId,
             className: this.props.className,
             style: {
               ...this.props.style,
               position: "absolute",
               visibility:
-                this.state.showClone && this.state.isDraging
-                  ? "visible"
-                  : "hidden",
+                showClone && this.state.isDraging ? "visible" : "hidden",
               margin: "0px",
               zIndex: 1000,
               left:
-                this.state.evtX +
+                this.state.eventPos[0] +
                 this.state.deltaPos[0] -
                 this.state.innerShift[0] +
                 "px",
               top:
-                this.state.evtY +
+                this.state.eventPos[1] +
                 this.state.deltaPos[1] -
                 this.state.innerShift[1] +
                 "px",
               width: this.state.size[0] + "px",
               height: this.state.size[1] + "px",
-              opacity: this.state.cloneOpacity
+              opacity: cloneOpacity
             }
           },
-          this.state.elements
+          this.props.children
         )
       ]
     );
